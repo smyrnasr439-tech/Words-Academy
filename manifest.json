@@ -3,13 +3,13 @@
   "name": "أكاديمية الكلمات لتعلم الإنجليزية",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "logo.2.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
     },
     {
-      "src": "logo.png",
+      "src": "logo.2.png",
       "type": "image/png",
       "sizes": "192x192"
     }
