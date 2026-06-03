@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>أكاديمية الكلمات الذكية</title>
   
-  <!-- استدعاء المكتبات الرسمية المستقرة عبر الـ CDN لضمان التشغيل الفوري -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -27,38 +26,12 @@
 </head>
 <body class="bg-slate-50 text-slate-800">
   
-  <!-- الحاوية الأساسية للتطبيق -->
   <div id="root"></div>
 
-  <!-- تم تعديل النوع إلى text/babel بشكل صحيح ليتعرف عليه المتصفح فوراً -->
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    const apiKey = ""; 
-
-    function writeString(view, offset, string) {
-      for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-    }
-
-    function pcmToWav(pcmBase64, sampleRate = 24000) {
-      const binaryString = atob(pcmBase64);
-      const len = binaryString.length;
-      const buffer = new ArrayBuffer(44 + len);
-      const view = new DataView(buffer);
-      
-      writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + len, true);
-      writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt ');
-      view.setUint32(16, 16, true); view.setUint16(20, 1, true);
-      view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true);
-      view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true);
-      view.setUint16(34, 16, true); writeString(view, 36, 'data');
-      view.setUint32(40, len, true);
-      
-      for (let i = 0; i < len; i++) view.setUint8(44 + i, binaryString.charCodeAt(i));
-      const blob = new Blob([buffer], { type: 'audio/wav' });
-      return URL.createObjectURL(blob);
-    }
-
+    // قاعدة البيانات مبسطة ومأمنة للتشغيل الأولي السريع
     const familyDictionary = {
       "Short A (صوت أَ القصير)": {
         at: [{ word: 'Bat', meaning: 'مضرب / خفاش', sound: 'بَاتْ' }, { word: 'Cat', meaning: 'قطة', sound: 'كَاتْ' }, { word: 'Hat', meaning: 'قبعة', sound: 'هَاتْ' }, { word: 'Mat', meaning: 'سجادة', sound: 'مَاتْ' }],
@@ -80,15 +53,6 @@
       { word: 'Rice', prefix: 'R', family: 'ice', meaning: 'أرز', options: ['R', 'P', 'N'] }
     ];
 
-    const Icons = {
-      home: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-      volume: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>,
-      loader: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
-      puzzle: <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 5a2.5 2.5 0 0 1 5 0V7h1.5A2.5 2.5 0 0 1 20.5 9.5V11h-2a2.5 2.5 0 0 0 0 5h2v1.5a2.5 2.5 0 0 1-2.5 2.5H16.5v-2a2.5 2.5 0 0 0-5 0v2H10A2.5 2.5 0 0 1 7.5 18V16.5h2a2.5 2.5 0 0 0 0-5h-2V9.5A2.5 2.5 0 0 1 10 7h1.5V5z"/></svg>,
-      book: <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
-      sparkles: <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-    };
-
     function App() {
       const [currentScreen, setCurrentScreen] = useState('menu');
 
@@ -102,6 +66,18 @@
         }
       };
 
+      // الأيقونات كدوال داخلية لمنع أخطاء الـ Babel خارج المكونات
+      const getIcon = (name) => {
+        switch(name) {
+          case 'home': return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+          case 'volume': return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
+          case 'puzzle': return <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 5a2.5 2.5 0 0 1 5 0V7h1.5A2.5 2.5 0 0 1 20.5 9.5V11h-2a2.5 2.5 0 0 0 0 5h2v1.5a2.5 2.5 0 0 1-2.5 2.5H16.5v-2a2.5 2.5 0 0 0-5 0v2H10A2.5 2.5 0 0 1 7.5 18V16.5h2a2.5 2.5 0 0 0 0-5h-2V9.5A2.5 2.5 0 0 1 10 7h1.5V5z"/></svg>;
+          case 'book': return <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+          case 'sparkles': return <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
+          default: return null;
+        }
+      };
+
       return (
         <div className="min-h-screen bg-slate-50 text-slate-800 pb-12">
           <header className="bg-indigo-950 text-white p-5 shadow-lg flex justify-between items-center">
@@ -111,44 +87,41 @@
             </div>
             {currentScreen !== 'menu' && (
               <button onClick={() => setCurrentScreen('menu')} className="bg-yellow-500 hover:bg-yellow-600 text-indigo-950 px-4 py-2 rounded-full font-black flex items-center gap-1 transition-transform active:scale-95">
-                {Icons.home} الرئيسية
+                {getIcon('home')} الرئيسية
               </button>
             )}
           </header>
 
           <main className="p-4 max-w-6xl mx-auto mt-6">
-            {currentScreen === 'menu' && <MainMenu onNavigate={setCurrentScreen} />}
-            {currentScreen === 'factory' && <WordFactory playTTS={playAudioIntelligent} />}
-            {currentScreen === 'dict' && <BasicDictionary playTTS={playAudioIntelligent} />}
-            {currentScreen === 'patterns' && <SpecialPatterns playTTS={playAudioIntelligent} />}
+            {currentScreen === 'menu' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div onClick={() => setCurrentScreen('factory')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-blue-500 transition-all">
+                  <div className="p-4 rounded-full bg-blue-50 text-blue-600 mb-4">{getIcon('puzzle')}</div>
+                  <h2 className="text-2xl font-bold mb-2">مصنع الكلمات</h2>
+                  <p className="text-slate-500">ركب الحروف مع العائلات الكبرى</p>
+                </div>
+                <div onClick={() => setCurrentScreen('dict')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-purple-500 transition-all">
+                  <div className="p-4 rounded-full bg-purple-50 text-purple-600 mb-4">{getIcon('book')}</div>
+                  <h2 className="text-2xl font-bold mb-2">الموسوعة الكبرى</h2>
+                  <p className="text-slate-500">جميع عائلات الحروف الصوتية</p>
+                </div>
+                <div onClick={() => setCurrentScreen('patterns')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-orange-500 transition-all">
+                  <div className="p-4 rounded-full bg-orange-50 text-orange-600 mb-4">{getIcon('sparkles')}</div>
+                  <h2 className="text-2xl font-bold mb-2">المقاطع والتشكيلات</h2>
+                  <p className="text-slate-500">قواعد نطق المقاطع المركبة</p>
+                </div>
+              </div>
+            )}
+
+            {currentScreen === 'factory' && <WordFactory playTTS={playAudioIntelligent} getIcon={getIcon} />}
+            {currentScreen === 'dict' && <BasicDictionary playTTS={playAudioIntelligent} getIcon={getIcon} />}
+            {currentScreen === 'patterns' && <SpecialPatterns playTTS={playAudioIntelligent} getIcon={getIcon} />}
           </main>
         </div>
       );
     }
 
-    function MainMenu({ onNavigate }) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div onClick={() => onNavigate('factory')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-blue-500 transition-all">
-            <div className="p-4 rounded-full bg-blue-50 text-blue-600 mb-4">{Icons.puzzle}</div>
-            <h2 className="text-2xl font-bold mb-2">مصنع الكلمات</h2>
-            <p className="text-slate-500">ركب الحروف مع العائلات الكبرى</p>
-          </div>
-          <div onClick={() => onNavigate('dict')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-purple-500 transition-all">
-            <div className="p-4 rounded-full bg-purple-50 text-purple-600 mb-4">{Icons.book}</div>
-            <h2 className="text-2xl font-bold mb-2">الموسوعة الكبرى</h2>
-            <p className="text-slate-500">جميع عائلات الحروف الصوتية</p>
-          </div>
-          <div onClick={() => onNavigate('patterns')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-orange-500 transition-all">
-            <div className="p-4 rounded-full bg-orange-50 text-orange-600 mb-4">{Icons.sparkles}</div>
-            <h2 className="text-2xl font-bold mb-2">المقاطع والتشكيلات</h2>
-            <p className="text-slate-500">قواعد نطق المقاطع المركبة</p>
-          </div>
-        </div>
-      );
-    }
-
-    function WordFactory({ playTTS }) {
+    function WordFactory({ playTTS, getIcon }) {
       const [levelIndex, setLevelIndex] = useState(0);
       const [feedback, setFeedback] = useState(null);
       const level = wordFactoryLevels[levelIndex];
@@ -182,7 +155,7 @@
       );
     }
 
-    function BasicDictionary({ playTTS }) {
+    function BasicDictionary({ playTTS, getIcon }) {
       return (
         <div className="space-y-8 animate-fadeIn">
           {Object.entries(familyDictionary).map(([group, families]) => (
@@ -196,7 +169,7 @@
                       {words.map((w, idx) => (
                         <div key={idx} className="bg-white p-3 rounded-lg flex justify-between items-center shadow-sm">
                           <span className="font-bold text-lg">{w.word} - {w.meaning}</span>
-                          <button onClick={() => playTTS(w.word)} className="bg-purple-100 p-2 rounded-full text-purple-700">{Icons.volume}</button>
+                          <button onClick={() => playTTS(w.word)} className="bg-purple-100 p-2 rounded-full text-purple-700">{getIcon('volume')}</button>
                         </div>
                       ))}
                     </div>
@@ -209,7 +182,7 @@
       );
     }
 
-    function SpecialPatterns({ playTTS }) {
+    function SpecialPatterns({ playTTS, getIcon }) {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
           {specialPatternsData.map((p, i) => (
@@ -222,7 +195,7 @@
               {p.examples.map((ex, idx) => (
                 <div key={idx} className="bg-slate-50 p-3 rounded-xl flex justify-between items-center mb-2">
                   <span className="font-bold">{ex.word} ({ex.meaning})</span>
-                  <button onClick={() => playTTS(ex.word)} className="bg-orange-100 p-2 rounded-full text-orange-600">{Icons.volume}</button>
+                  <button onClick={() => playTTS(ex.word)} className="bg-orange-100 p-2 rounded-full text-orange-600">{getIcon('volume')}</button>
                 </div>
               ))}
             </div>
@@ -231,7 +204,8 @@
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
     root.render(<App />);
   </script>
 </body>
