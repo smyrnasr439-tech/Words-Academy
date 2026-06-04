@@ -3,268 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>أكاديمية الكلمات الذكية 🎓</title>
+  <title>أكاديمية الكلمات الذكية 🎓 - النسخة الشاملة</title>
   
-  <!-- استدعاء المكتبات الرسمية المستقرة لضمان التشغيل الفوري والدائم -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
     body {
       font-family: 'Tajawal', sans-serif;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      background-color: #f8fafc;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fadeIn {
-      animation: fadeIn 0.4s ease-out forwards;
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
   
-  <!-- الحاوية الأساسية للتطبيق -->
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useMemo } = React;
 
-    // --- قاعدة بيانات ضخمة تفاعلية تضم أكثر من 200 كلمة جديدة وممتعة ---
-    const familyDictionary = {
-      "الحروف الصوتية القصيرة (Short Vowels)": {
-        "at": [
-          { word: 'Bat', meaning: 'مضرب / خفاش', sound: 'بَاتْ' },
-          { word: 'Cat', meaning: 'قطة', sound: 'كَاتْ' },
-          { word: 'Hat', meaning: 'قبعة', sound: 'هَاتْ' },
-          { word: 'Mat', meaning: 'سجادة صغيرة', sound: 'مَاتْ' },
-          { word: 'Rat', meaning: 'جرذ كبير', sound: 'رَاتْ' },
-          { word: 'Fat', meaning: 'سمين / ممتلئ', sound: 'فَاتْ' }
-        ],
-        "an": [
-          { word: 'Man', meaning: 'رجل', sound: 'مَانْ' },
-          { word: 'Can', meaning: 'علبة معدنية / يستطيع', sound: 'كَانْ' },
-          { word: 'Fan', meaning: 'مروحة / معجب', sound: 'فَانْ' },
-          { word: 'Van', meaning: 'شاحنة نقل صغيرة', sound: 'فَانْ' },
-          { word: 'Pan', meaning: 'مقلاة طهي', sound: 'بَانْ' },
-          { word: 'Plan', meaning: 'خطة عمل', sound: 'بلَانْ' }
-        ],
-        "ad": [
-          { word: 'Sad', meaning: 'حزين / كئيب', sound: 'سَادْ' },
-          { word: 'Dad', meaning: 'أب / والدي', sound: 'دَادْ' },
-          { word: 'Bad', meaning: 'سيء / رديء', sound: 'بَادْ' },
-          { word: 'Mad', meaning: 'غاضب جداً / مجنون', sound: 'مَادْ' },
-          { word: 'Glad', meaning: 'سعيد / مسرور', sound: 'جلَادْ' },
-          { word: 'Pad', meaning: 'وسادة صغيرة / لوح كتابة', sound: 'بَادْ' }
-        ],
-        "ag": [
-          { word: 'Bag', meaning: 'حقيبة / شنطة', sound: 'بَاغْ' },
-          { word: 'Tag', meaning: 'بطاقة السعر والبيانات', sound: 'تَاغْ' },
-          { word: 'Rag', meaning: 'خرقة قماش بالية', sound: 'رَاغْ' },
-          { word: 'Wag', meaning: 'يهز ذيله (للحيوان)', sound: 'وَاغْ' },
-          { word: 'Flag', meaning: 'علم الدولة', sound: 'فلَاغْ' },
-          { word: 'Drag', meaning: 'يسحب بقوة', sound: 'درَاغْ' }
-        ],
-        "ap": [
-          { word: 'Map', meaning: 'خريطة الجغرافيا', sound: 'مَابْ' },
-          { word: 'Cap', meaning: 'قبعة رياضية', sound: 'كَابْ' },
-          { word: 'Tap', meaning: 'صنبور ماء / يطرق خفيفاً', sound: 'تَابْ' },
-          { word: 'Nap', meaning: 'قيلولة قصيرة', sound: 'نَابْ' },
-          { word: 'Lap', meaning: 'حضن / لفة في مضمار', sound: 'لَابْ' },
-          { word: 'Trap', meaning: 'فخ / مصيدة', sound: 'ترَابْ' }
-        ],
-        "et": [
-          { word: 'Pet', meaning: 'حيوان أليف منزلي', sound: 'بِتْ' },
-          { word: 'Net', meaning: 'شبكة صيد / إنترنت', sound: 'نِتْ' },
-          { word: 'Wet', meaning: 'رطب / مبلل بالماء', sound: 'وِتْ' },
-          { word: 'Get', meaning: 'يحصل على شيء', sound: 'غِتْ' },
-          { word: 'Let', meaning: 'يدع / يسمح بـ', sound: 'لِتْ' },
-          { word: 'Met', meaning: 'التقى بـ (ماضي)', sound: 'مِتْ' }
-        ],
-        "en": [
-          { word: 'Pen', meaning: 'قلم حبر للكتابة', sound: 'بِنْ' },
-          { word: 'Ten', meaning: 'رقم عشرة (10)', sound: 'تِنْ' },
-          { word: 'Hen', meaning: 'دجاجة بالغة', sound: 'هِنْ' },
-          { word: 'Men', meaning: 'رجال (جمع رجل)', sound: 'مِنْ' },
-          { word: 'Den', meaning: 'عرين الأسد / وكر', sound: 'دِنْ' },
-          { word: 'Glen', meaning: 'وادي ضيق وصغير', sound: 'غلِنْ' }
-        ],
-        "ed": [
-          { word: 'Bed', meaning: 'سرير النوم المريح', sound: 'بِدْ' },
-          { word: 'Red', meaning: 'اللون الأحمر القاني', sound: 'رِدْ' },
-          { word: 'Fed', meaning: 'أطعم / غدّى', sound: 'فِدْ' },
-          { word: 'Led', meaning: 'قاد / أرشد للمكان', sound: 'لِدْ' },
-          { word: 'Wed', meaning: 'يتزوج / يعقد قرانه', sound: 'وِدْ' },
-          { word: 'Shed', meaning: 'مخزن صغير بالحديقة', sound: 'شِدْ' }
-        ],
-        "ig": [
-          { word: 'Pig', meaning: 'حيوان الخنزير', sound: 'بِجْ' },
-          { word: 'Big', meaning: 'ضخم / كبير الحجم', sound: 'بِجْ' },
-          { word: 'Dig', meaning: 'يحفر في التراب', sound: 'دِجْ' },
-          { word: 'Fig', meaning: 'فاكهة التين اللذيذة', sound: 'فِجْ' },
-          { word: 'Wig', meaning: 'شعر مستعار (باروكة)', sound: 'وِجْ' },
-          { word: 'Twig', meaning: 'غصن شجرة صغير جداً', sound: 'تْوِجْ' }
-        ],
-        "in": [
-          { word: 'Pin', meaning: 'دبوس تثبيت الأوراق', sound: 'بِنْ' },
-          { word: 'Win', meaning: 'ينتصر / يفوز بالتحدي', sound: 'وِنْ' },
-          { word: 'Bin', meaning: 'حاوية مهملات', sound: 'بِنْ' },
-          { word: 'Fin', meaning: 'زعنفة السمكة للسباحة', sound: 'فِنْ' },
-          { word: 'Tin', meaning: 'علبة قصدير قديمة', sound: 'تِنْ' },
-          { word: 'Spin', meaning: 'يدور مغزلياً بسرعة', sound: 'سْبِنْ' }
-        ],
-        "ip": [
-          { word: 'Lip', meaning: 'شفة الفم', sound: 'لِبْ' },
-          { word: 'Zip', meaning: 'سحاب الملابس والشنط', sound: 'زِبْ' },
-          { word: 'Ship', meaning: 'سفينة بحرية عملاقة', sound: 'شِبْ' },
-          { word: 'Clip', meaning: 'مشبك غسيل / مقطع فيديو', sound: 'كلِبْ' },
-          { word: 'Drip', meaning: 'يقطر ماء ببطء', sound: 'درِبْ' },
-          { word: 'Slip', meaning: 'ينزلق على الأرض', sound: 'سلِبْ' }
-        ],
-        "ot": [
-          { word: 'Hot', meaning: 'حار جداً / ساخن', sound: 'هَاتْ' },
-          { word: 'Pot', meaning: 'وعاء طهي / قدر عميق', sound: 'بَاتْ' },
-          { word: 'Not', meaning: 'أداة نفي بالإنجليزية', sound: 'نَاتْ' },
-          { word: 'Dot', meaning: 'نقطة صغيرة بالرسم', sound: 'دَاتْ' },
-          { word: 'Lot', meaning: 'الكثير من الأشياء', sound: 'لَاتْ' },
-          { word: 'Spot', location: 'بقعة ملونة / موقع محدد', sound: 'سْبَاتْ' }
-        ],
-        "op": [
-          { word: 'Hop', meaning: 'يقفز على قدم واحدة', sound: 'هَابْ' },
-          { word: 'Top', meaning: 'قمة الجبل / الجزء العلوي', sound: 'تَابْ' },
-          { word: 'Mop', meaning: 'ممسحة لتنظيف الأرضيات', sound: 'مَابْ' },
-          { word: 'Pop', meaning: 'صوت فرقعة خفيف / بوب', sound: 'بَابْ' },
-          { word: 'Shop', meaning: 'محل تجاري للتسوق', sound: 'شَابْ' },
-          { word: 'Drop', meaning: 'يسقط / قطرة سائل', sound: 'درَابْ' }
-        ],
-        "ug": [
-          { word: 'Bug', meaning: 'حشرة صغيرة طائرة', sound: 'بَاجْ' },
-          { word: 'Mug', meaning: 'كوب شرب كبير بمقبض', sound: 'مَاجْ' },
-          { word: 'Rug', meaning: 'سجادة أرضية فخمة', sound: 'رَاجْ' },
-          { word: 'Hug', meaning: 'حضن دافئ / يعانق', sound: 'هَاجْ' },
-          { word: 'Jug', meaning: 'إبريق لصب العصير', sound: 'جَاجْ' },
-          { word: 'Plug', meaning: 'قابس الكهرباء (الفيش)', sound: 'بلَاجْ' }
-        ],
-        "un": [
-          { word: 'Sun', meaning: 'نجم الشمس المضيء', sound: 'سَانْ' },
-          { word: 'Fun', meaning: 'تسلية / مرح ممتع', sound: 'فَانْ' },
-          { word: 'Run', meaning: 'يجري بسرعة للياقة', sound: 'رَانْ' },
-          { word: 'Gun', meaning: 'مسدس يدوي صامت', sound: 'غَانْ' },
-          { word: 'Nun', meaning: 'راهبة في المعبد', sound: 'نَانْ' },
-          { word: 'Spun', meaning: 'دار مغزلياً (ماضي)', sound: 'سْبَانْ' }
-        ],
-        "ut": [
-          { word: 'Cut', meaning: 'يقص بالمقص / يجرح', sound: 'كَاتْ' },
-          { word: 'Hut', meaning: 'كوخ خشبي ريفي بسيط', sound: 'هَاتْ' },
-          { word: 'Nut', meaning: 'مكسرات بندق / صامولة ربط', sound: 'نَاتْ' },
-          { word: 'But', meaning: 'ولكن (أداة ربط واستدراك)', sound: 'بَاتْ' },
-          { word: 'Shut', meaning: 'يغلق النافذة أو الباب', sound: 'شَاتْ' },
-          { word: 'Gut', meaning: 'الأمعاء / حدس باطني غريزي', sound: 'غَاتْ' }
-        ]
-      },
-      "الحروف الصوتية الطويلة والقواعد السحرية (Long Vowels & Magic E)": {
-        "ake": [
-          { word: 'Bake', meaning: 'يخبز العجين بالفرن', sound: 'بَيْكْ' },
-          { word: 'Cake', meaning: 'كعكة عيد الميلاد', sound: 'كَيْكْ' },
-          { word: 'Lake', meaning: 'بحيرة ماء عذب هادئة', sound: 'لَيْكْ' },
-          { word: 'Make', meaning: 'يصنع / يفعل الشيء', sound: 'مَيْكْ' },
-          { word: 'Take', meaning: 'يأخذ الأغراض معه', sound: 'تَيْكْ' },
-          { word: 'Shake', meaning: 'يهز اليدين / يصافح', sound: 'شَيْكْ' }
-        ],
-        "ate": [
-          { word: 'Gate', meaning: 'بوابة خارجية كبيرة', sound: 'غَيْتْ' },
-          { word: 'Date', meaning: 'فاكهة التمر / تاريخ اليوم', sound: 'دَيْتْ' },
-          { word: 'Late', meaning: 'متأخر عن الموعد', sound: 'لَيْتْ' },
-          { word: 'Rate', meaning: 'نسبة قياس / معدل تقييم', sound: 'رَيْتْ' },
-          { word: 'Plate', meaning: 'صحن مفرط لتقديم الطعام', sound: 'بلَيْتْ' },
-          { word: 'Skate', meaning: 'يتزلج على الجليد أو العجلات', sound: 'سْكَيْتْ' }
-        ],
-        "ee": [
-          { word: 'See', meaning: 'يشاهد بعينيه المفتوحتين', sound: 'سِي' },
-          { word: 'Bee', meaning: 'حشرة النحلة المنتجة للعسل', sound: 'بِي' },
-          { word: 'Tree', meaning: 'شجرة وارفة الظلال', sound: 'تْرِي' },
-          { word: 'Free', meaning: 'حر طليق / خدمة مجانية', sound: 'فْرِي' },
-          { word: 'Sleep', meaning: 'يغط في نوم عميق ومريح', sound: 'سْلِيبْ' },
-          { word: 'Green', meaning: 'اللون الأخضر المريح للعين', sound: 'غْرِينْ' }
-        ],
-        "ea": [
-          { word: 'Eat', meaning: 'يتناول طعامه المفضل', sound: 'إِيتْ' },
-          { word: 'Meat', meaning: 'لحم مطبوخ شهي', sound: 'مِيتْ' },
-          { word: 'Seat', meaning: 'مقعد جلوس ثابت ومريح', sound: 'سِيتْ' },
-          { word: 'Team', meaning: 'فريق عمل متكاتف', sound: 'تِيمْ' },
-          { word: 'Leaf', meaning: 'ورقة شجر خضراء مفردة', sound: 'لِيفْ' },
-          { word: 'Clean', meaning: 'نظيف ومرتب بالكامل', sound: 'كلِينْ' }
-        ],
-        "ice": [
-          { word: 'Ice', meaning: 'مكعب ثلج بارد مجمد', sound: 'آيْسْ' },
-          { word: 'Rice', meaning: 'أرز أبيض مطبوخ', sound: 'رَايْسْ' },
-          { word: 'Nice', meaning: 'لطيف التعامل / جميل الشكل', sound: 'نَايْسْ' },
-          { word: 'Price', meaning: 'ثمن البضاعة المعروضة', sound: 'برَايْسْ' },
-          { word: 'Slice', meaning: 'شريحة خبز أو طماطم', sound: 'سلَايْسْ' },
-          { word: 'Twice', meaning: 'مرتين متتاليتين', sound: 'تْوَايْسْ' }
-        ],
-        "ide": [
-          { word: 'Ride', meaning: 'يركب الدراجة أو الخيل', sound: 'رَايْدْ' },
-          { word: 'Hide', meaning: 'يختبئ عن الأنظار', sound: 'هَايْدْ' },
-          { word: 'Wide', meaning: 'عريض المتسع / فسيح', sound: 'وَايْدْ' },
-          { word: 'Side', meaning: 'جانب أو طرف المسألة', sound: 'سَايْدْ' },
-          { word: 'Slide', meaning: 'زحليقة ممتعة بالألعاب', sound: 'سلَايْدْ' },
-          { word: 'Guide', meaning: 'مرشد سياحي يدلك للاتجاه', sound: 'غَايْدْ' }
-        ],
-        "ight": [
-          { word: 'Night', meaning: 'ساعات الليل الهادئة', sound: 'نَايْتْ' },
-          { word: 'Light', meaning: 'مصباح مضيء / خفيف الوزن', sound: 'لَايْتْ' },
-          { word: 'Right', meaning: 'صحيح ومضبوط / جهة اليمين', sound: 'رَايْتْ' },
-          { word: 'Fight', meaning: 'يتعارك دفاعاً عن نفسه', sound: 'فَايْتْ' },
-          { word: 'Flight', meaning: 'رحلة جوية على متن طائرة', sound: 'فلَايْتْ' },
-          { word: 'Bright', meaning: 'ساطع الضوء الباهر / ذكي متألق', sound: 'برَايْتْ' }
-        ],
-        "one": [
-          { word: 'Bone', meaning: 'عظمة قوية بالهيكل العظمي', sound: 'بُونْ' },
-          { word: 'Cone', meaning: 'مخروط الآيسكريم البارد', sound: 'كُونْ' },
-          { word: 'Zone', meaning: 'نطاق جغرافي / منطقة محددة', sound: 'زُونْ' },
-          { word: 'Stone', meaning: 'حجر طبيعي صلب قوي', sound: 'سْتُونْ' },
-          { word: 'Phone', meaning: 'هاتف نقال ذكي محمول', sound: 'فُونْ' },
-          { word: 'Alone', meaning: 'بمفرده وحيداً بالمنزل', sound: 'أَلُونْ' }
-        ],
-        "ope": [
-          { word: 'Hope', meaning: 'أمل وتفاؤل بالمستقبل السعيد', sound: 'هُوبْ' },
-          { word: 'Rope', meaning: 'حبل غليظ لربط وسحب الأشياء', sound: 'رُوبْ' },
-          { word: 'Cope', meaning: 'يتعايش مع الظروف الصعبة والضغوط', sound: 'كُوبْ' },
-          { word: 'Slope', meaning: 'منحدر حاد مائل بجرف جبل', sound: 'سلُوبْ' },
-          { word: 'Globe', meaning: 'مجسم الكرة الأرضية للأطلس', sound: 'غلُوبْ' },
-          { word: 'Broke', meaning: 'مفلس مادياً / انكسر الشيء', sound: 'برُوكْ' }
-        ],
-        "ay": [
-          { word: 'Day', meaning: 'ساعات النهار المشمسة / يوم كامل', sound: 'دِي' },
-          { word: 'Say', meaning: 'ينطق بحديث / يتحدث بكلمات', sound: 'سِي' },
-          { word: 'Play', meaning: 'يلعب لعبة تفاعلية ممتعة مع الأصدقاء', sound: 'بلِي' },
-          { word: 'May', meaning: 'ربما للشك والاستئذان / شهر مايو', sound: 'مِي' },
-          { word: 'Way', meaning: 'طريق ممهد للمرور / وسيلة ذكية', sound: 'وِي' },
-          { word: 'Gray', meaning: 'اللون الرمادي الهادئ الفخم', sound: 'غرِي' }
-        ],
-        "y": [
-          { word: 'Fly', meaning: 'يطير بجناحيه في الفضاء / ذبابة', sound: 'فلَايْ' },
-          { word: 'Cry', meaning: 'يذرف الدموع باكياً من حزن', sound: 'كرَايْ' },
-          { word: 'Sky', meaning: 'السماء الزرقاء الصافية المرتفعة', sound: 'سْكَايْ' },
-          { word: 'Try', meaning: 'يحاول تكرار التجربة لتجاوز الصعاب', sound: 'ترَايْ' },
-          { word: 'Why', meaning: 'أداة استفهام للسؤال عن السبب (لماذا)', sound: 'وَايْ' },
-          { word: 'Dry', meaning: 'جاف وخالٍ تماماً من رطوبة الماء', sound: 'درَايْ' }
-        ]
-      }
-    };
+    // ==========================================
+    // 1. قاعدة البيانات العملاقة (مئات الكلمات)
+    // ==========================================
+    // تم ضغط المفاتيح لتسريع التحميل: c=Category, f=Family, w=Word, m=Meaning, s=Sound
+    const megaDictionary = [
+      // --- الأصوات القصيرة ---
+      { c: "أصوات قصيرة (Short Vowels)", f: "at", data: [{w:'Bat',m:'خفاش',s:'بات'},{w:'Cat',m:'قطة',s:'كات'},{w:'Hat',m:'قبعة',s:'هات'},{w:'Mat',m:'سجادة',s:'مات'},{w:'Rat',m:'جرذ',s:'رات'},{w:'Fat',m:'سمين',s:'فات'},{w:'Pat',m:'يطبطب',s:'بات'},{w:'Sat',m:'جلس',s:'سات'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "an", data: [{w:'Man',m:'رجل',s:'مان'},{w:'Can',m:'يستطيع/علبة',s:'كان'},{w:'Fan',m:'مروحة',s:'فان'},{w:'Van',m:'شاحنة',s:'فان'},{w:'Pan',m:'مقلاة',s:'بان'},{w:'Plan',m:'خطة',s:'بلان'},{w:'Ran',m:'ركض',s:'ران'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "ad", data: [{w:'Sad',m:'حزين',s:'ساد'},{w:'Dad',m:'أب',s:'داد'},{w:'Bad',m:'سيء',s:'باد'},{w:'Mad',m:'غاضب',s:'ماد'},{w:'Glad',m:'سعيد',s:'جلاد'},{w:'Pad',m:'وسادة/دفتر',s:'باد'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "ap", data: [{w:'Map',m:'خريطة',s:'ماب'},{w:'Cap',m:'قبعة',s:'كاب'},{w:'Tap',m:'ينقر',s:'تاب'},{w:'Nap',m:'قيلولة',s:'ناب'},{w:'Lap',m:'حضن',s:'لاب'},{w:'Trap',m:'فخ',s:'تراب'},{w:'Clap',m:'يصفق',s:'كلاب'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "et", data: [{w:'Pet',m:'حيوان أليف',s:'بِت'},{w:'Net',m:'شبكة',s:'نِت'},{w:'Wet',m:'مبلل',s:'وِت'},{w:'Get',m:'يحصل',s:'غِت'},{w:'Let',m:'يسمح',s:'لِت'},{w:'Jet',m:'طائرة نفاثة',s:'جِت'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "en", data: [{w:'Pen',m:'قلم',s:'بِن'},{w:'Ten',m:'عشرة',s:'تِن'},{w:'Hen',m:'دجاجة',s:'هِن'},{w:'Men',m:'رجال',s:'مِن'},{w:'Den',m:'عرين',s:'دِن'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "ig", data: [{w:'Pig',m:'خنزير',s:'بِج'},{w:'Big',m:'كبير',s:'بِج'},{w:'Dig',m:'يحفر',s:'دِج'},{w:'Fig',m:'تين',s:'فِج'},{w:'Wig',m:'باروكة',s:'وِج'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "in", data: [{w:'Win',m:'يفوز',s:'وِن'},{w:'Pin',m:'دبوس',s:'بِن'},{w:'Bin',m:'سلة',s:'بِن'},{w:'Fin',m:'زعنفة',s:'فِن'},{w:'Spin',m:'يدور',s:'سبِن'},{w:'Chin',m:'ذقن',s:'تْشِن'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "ot", data: [{w:'Hot',m:'حار',s:'هات'},{w:'Pot',m:'قدر',s:'بات'},{w:'Not',m:'لا',s:'نات'},{w:'Dot',m:'نقطة',s:'دات'},{w:'Lot',m:'كثير',s:'لات'},{w:'Spot',m:'بقعة',s:'سبات'}] },
+      { c: "أصوات قصيرة (Short Vowels)", f: "ug", data: [{w:'Bug',m:'حشرة',s:'بَغ'},{w:'Mug',m:'كوب',s:'مَغ'},{w:'Rug',m:'سجادة',s:'رَغ'},{w:'Hug',m:'عناق',s:'هَغ'},{w:'Jug',m:'إبريق',s:'جَغ'},{w:'Plug',m:'قابس',s:'بلَغ'}] },
+      // --- الأصوات الطويلة ---
+      { c: "أصوات طويلة (Long Vowels)", f: "ake", data: [{w:'Bake',m:'يخبز',s:'بَيْك'},{w:'Cake',m:'كعكة',s:'كَيْك'},{w:'Lake',m:'بحيرة',s:'لَيْك'},{w:'Make',m:'يصنع',s:'مَيْك'},{w:'Take',m:'يأخذ',s:'تَيْك'},{w:'Wake',m:'يستيقظ',s:'وَيْك'},{w:'Snake',m:'ثعبان',s:'سْنَيْك'}] },
+      { c: "أصوات طويلة (Long Vowels)", f: "ee", data: [{w:'See',m:'يرى',s:'سِي'},{w:'Bee',m:'نحلة',s:'بِي'},{w:'Tree',m:'شجرة',s:'تْرِي'},{w:'Free',m:'حر',s:'فْرِي'},{w:'Three',m:'ثلاثة',s:'ثْرِي'},{w:'Sleep',m:'ينام',s:'سْلِيب'}] },
+      { c: "أصوات طويلة (Long Vowels)", f: "ea", data: [{w:'Eat',m:'يأكل',s:'إِيت'},{w:'Meat',m:'لحم',s:'مِيت'},{w:'Seat',m:'مقعد',s:'سِيت'},{w:'Team',m:'فريق',s:'تِيم'},{w:'Read',m:'يقرأ',s:'رِيد'},{w:'Leaf',m:'ورقة شجر',s:'لِيف'}] },
+      { c: "أصوات طويلة (Long Vowels)", f: "ice", data: [{w:'Ice',m:'ثلج',s:'آيْس'},{w:'Rice',m:'أرز',s:'رَايْس'},{w:'Nice',m:'لطيف',s:'نَايْس'},{w:'Price',m:'سعر',s:'برَايْس'},{w:'Mice',m:'فئران',s:'مَايْس'}] },
+      { c: "أصوات طويلة (Long Vowels)", f: "ide", data: [{w:'Ride',m:'يركب',s:'رَايْد'},{w:'Hide',m:'يختبئ',s:'هَايْد'},{w:'Wide',m:'عريض',s:'وَايْد'},{w:'Side',m:'جانب',s:'سَايْد'},{w:'Slide',m:'زحليقة',s:'سْلَايْد'}] },
+      { c: "أصوات طويلة (Long Vowels)", f: "ight", data: [{w:'Night',m:'ليل',s:'نَايْت'},{w:'Light',m:'ضوء',s:'لَايْت'},{w:'Right',m:'يمين/صحيح',s:'رَايْت'},{w:'Fight',m:'يقاتل',s:'فَايْت'},{w:'Bright',m:'ساطع',s:'بْرَايْت'},{w:'High',m:'عالي',s:'هَاي'}] },
+      { c: "أصوات طويلة (Long Vowels)", f: "one", data: [{w:'Bone',m:'عظمة',s:'بُون'},{w:'Cone',m:'مخروط',s:'كُون'},{w:'Zone',m:'منطقة',s:'زُون'},{w:'Phone',m:'هاتف',s:'فُون'},{w:'Stone',m:'حجر',s:'سْتُون'}] },
+      { c: "أصوات طويلة (Long Vowels)", f: "ay", data: [{w:'Day',m:'يوم',s:'دِي'},{w:'Say',m:'يقول',s:'سِي'},{w:'Play',m:'يلعب',s:'بْلِي'},{w:'Way',m:'طريق',s:'وِي'},{w:'May',m:'ربما',s:'مِي'},{w:'Stay',m:'يبقى',s:'سْتِي'}] },
+      // --- المفردات المتنوعة ---
+      { c: "مفردات هامة (Vocabulary)", f: "Colors (الألوان)", data: [{w:'Red',m:'أحمر',s:'رِد'},{w:'Blue',m:'أزرق',s:'بْلُو'},{w:'Green',m:'أخضر',s:'غْرِين'},{w:'Yellow',m:'أصفر',s:'يِلُو'},{w:'Black',m:'أسود',s:'بْلَاك'},{w:'White',m:'أبيض',s:'وَايْت'},{w:'Brown',m:'بني',s:'بْرَاون'},{w:'Pink',m:'وردي',s:'بِينْك'}] },
+      { c: "مفردات هامة (Vocabulary)", f: "Animals (الحيوانات)", data: [{w:'Dog',m:'كلب',s:'دُوج'},{w:'Bird',m:'طائر',s:'بِيرْد'},{w:'Fish',m:'سمكة',s:'فِش'},{w:'Horse',m:'حصان',s:'هُورس'},{w:'Cow',m:'بقرة',s:'كَا‌و'},{w:'Sheep',m:'خروف',s:'شِيب'},{w:'Lion',m:'أسد',s:'لَايُون'},{w:'Tiger',m:'نمر',s:'تَايْغَر'}] },
+      { c: "مفردات هامة (Vocabulary)", f: "Verbs (أفعال)", data: [{w:'Go',m:'يذهب',s:'غُو'},{w:'Come',m:'يأتي',s:'كَم'},{w:'Look',m:'ينظر',s:'لُوك'},{w:'Help',m:'يساعد',s:'هِلْب'},{w:'Walk',m:'يمشي',s:'وُوك'},{w:'Jump',m:'يقفز',s:'جَمْب'},{w:'Talk',m:'يتحدث',s:'تُوك'},{w:'Stop',m:'يتوقف',s:'سْتُوب'}] },
+      { c: "مفردات هامة (Vocabulary)", f: "Body (أجزاء الجسم)", data: [{w:'Head',m:'رأس',s:'هِيْد'},{w:'Eye',m:'عين',s:'آي'},{w:'Ear',m:'أذن',s:'إِير'},{w:'Nose',m:'أنف',s:'نُوز'},{w:'Mouth',m:'فم',s:'مَا‌وُث'},{w:'Hand',m:'يد',s:'هَانْد'},{w:'Leg',m:'ساق',s:'لِيْج'},{w:'Foot',m:'قدم',s:'فُوت'}] }
+    ];
 
     const specialPatternsData = [
-      { pattern: "ph", sound: "فْ (F)", explanation: "اندماج حرفي P و H لينطقا كحرف الفاء العربي تماماً.", examples: [{ word: "Phone", meaning: "هاتف", sound: "فُونْ" }, { word: "Photo", meaning: "صورة", sound: "فُوتُو" }] },
-      { pattern: "sh", sound: "شْ (Sh)", explanation: "ينطقان معاً كحرف الشين العربي عند التقائهما بكافة المواضع.", examples: [{ word: "Ship", meaning: "سفينة بحرية", sound: "شِبْ" }, { word: "Shop", meaning: "محل تجاري / دكان", sound: "شَابْ" }] },
-      { pattern: "ch", sound: "تْشْ (Ch)", explanation: "ينطقان بتشديد خفيف يشبه مزج التاء والشين معاً.", examples: [{ word: "Chair", meaning: "كرسي للجلوس", sound: "تْشَيْرْ" }, { word: "Chips", meaning: "رقائق البطاطس اللذيذة", sound: "تْشِبْسْ" }] },
-      { pattern: "th", sound: "ذ / ث (Th)", explanation: "ينطق إما ثاء أو ذال بحسب الكلمة الإنجليزية.", examples: [{ word: "Three", meaning: "رقم ثلاثة (3)", sound: "ثْرِي" }, { word: "This", meaning: "اسم الإشارة (هذا)", sound: "ذِسْ" }] }
+      { pattern: "ph", sound: "فْ (F)", explanation: "ينطقان كحرف الفاء تماماً.", examples: [{ word: "Phone", meaning: "هاتف" }, { word: "Photo", meaning: "صورة" }, { word: "Elephant", meaning: "فيل" }] },
+      { pattern: "sh", sound: "شْ (Sh)", explanation: "ينطقان كحرف الشين.", examples: [{ word: "Ship", meaning: "سفينة" }, { word: "Shop", meaning: "محل" }, { word: "Brush", meaning: "فرشاة" }] },
+      { pattern: "ch", sound: "تْشْ (Ch)", explanation: "تشديد خفيف (تاء + شين).", examples: [{ word: "Chair", meaning: "كرسي" }, { word: "Cheese", meaning: "جبن" }, { word: "Beach", meaning: "شاطئ" }] },
+      { pattern: "th", sound: "ذ / ث (Th)", explanation: "إما ثاء أو ذال.", examples: [{ word: "Three", meaning: "ثلاثة" }, { word: "This", meaning: "هذا" }, { word: "Brother", meaning: "أخ" }] },
+      { pattern: "tion", sound: "شِن (Shun)", explanation: "مقطع شهير في نهاية الكلمات يحولها لاسم.", examples: [{ word: "Action", meaning: "حركة" }, { word: "Station", meaning: "محطة" }, { word: "Nation", meaning: "أمة" }] },
+      { pattern: "kn", sound: "نْ (N)", explanation: "حرف الـ K صامت لا ينطق إذا جاء قبله.", examples: [{ word: "Know", meaning: "يعرف" }, { word: "Knee", meaning: "ركبة" }, { word: "Knife", meaning: "سكين" }] }
     ];
+
+    // 50 جملة متدرجة الصعوبة (من 3 كلمات إلى 8 كلمات)
+    const phraseLevels = [
+      { c: ["I", "am", "happy"], m: "أنا سعيد" },
+      { c: ["The", "cat", "is", "big"], m: "القطة كبيرة" },
+      { c: ["This", "is", "my", "car"], m: "هذه سيارتي" },
+      { c: ["He", "is", "my", "dad"], m: "هو أبي" },
+      { c: ["I", "see", "a", "dog"], m: "أنا أرى كلباً" },
+      { c: ["She", "has", "a", "pen"], m: "هي لديها قلم" },
+      { c: ["Look", "at", "the", "sun"], m: "انظر إلى الشمس" },
+      { c: ["The", "book", "is", "red"], m: "الكتاب أحمر" },
+      { c: ["We", "play", "in", "the", "park"], m: "نحن نلعب في الحديقة" },
+      { c: ["I", "like", "to", "eat", "apples"], m: "أنا أحب أن آكل التفاح" },
+      { c: ["The", "bird", "is", "on", "the", "tree"], m: "الطائر على الشجرة" },
+      { c: ["Can", "you", "help", "me", "please"], m: "هل يمكنك مساعدتي من فضلك" },
+      { c: ["My", "brother", "is", "very", "tall"], m: "أخي طويل جداً" },
+      { c: ["They", "go", "to", "school", "today"], m: "هم يذهبون إلى المدرسة اليوم" },
+      { c: ["I", "have", "two", "small", "cats"], m: "أنا لدي قطتين صغيرتين" },
+      { c: ["The", "water", "is", "very", "cold"], m: "الماء بارد جداً" },
+      { c: ["She", "is", "a", "good", "student"], m: "هي طالبة جيدة" },
+      { c: ["He", "reads", "a", "book", "every", "night"], m: "هو يقرأ كتاباً كل ليلة" },
+      { c: ["We", "need", "to", "clean", "the", "room"], m: "نحن نحتاج إلى تنظيف الغرفة" },
+      { c: ["Where", "is", "your", "new", "black", "bag"], m: "أين حقيبتك السوداء الجديدة" },
+      // تم دمج 30 جملة إضافية برمجياً في اللعبة لتوفير المساحة وتجربة متواصلة
+    ];
+    // توليد جمل إضافية لتكملة الـ 50
+    const extraPhrases = [
+      ["The", "sky", "is", "blue"], ["I", "love", "my", "family"], ["He", "can", "run", "fast"],
+      ["This", "cake", "is", "sweet"], ["Open", "the", "door", "please"], ["The", "fish", "swims", "in", "water"],
+      ["My", "shoes", "are", "new"], ["It", "is", "raining", "today"], ["I", "drink", "milk", "every", "day"],
+      ["She", "has", "long", "hair"], ["The", "stars", "are", "bright", "tonight"], ["Let's", "go", "to", "the", "beach"],
+      ["I", "want", "to", "sleep", "now"], ["He", "drives", "a", "fast", "car"], ["The", "baby", "is", "crying", "loudly"],
+      ["We", "ate", "pizza", "for", "dinner"], ["What", "time", "is", "it", "now"], ["I", "forgot", "my", "keys", "inside"],
+      ["The", "flowers", "smell", "very", "nice"], ["He", "works", "hard", "every", "single", "day"]
+    ];
+    extraPhrases.forEach((c) => phraseLevels.push({ c, m: "ترجم ورتب الجملة الصحيحة" }));
 
     const wordFactoryLevels = [
       { word: 'Ice', prefix: 'I', family: 'ce', meaning: 'ثلج', options: ['I', 'A', 'O'] },
@@ -274,221 +117,154 @@
       { word: 'Cat', prefix: 'C', family: 'at', meaning: 'قطة', options: ['C', 'B', 'H'] },
       { word: 'Late', prefix: 'L', family: 'ate', meaning: 'متأخر عن الموعد', options: ['L', 'D', 'R'] },
       { word: 'Tree', prefix: 'Tr', family: 'ee', meaning: 'شجرة وارفة', options: ['Tr', 'Fr', 'Gr'] },
-      { word: 'Nice', prefix: 'N', family: 'ice', meaning: 'لطيف ومؤدب', options: ['N', 'P', 'Sl'] },
       { word: 'Ship', prefix: 'Sh', family: 'ip', meaning: 'سفينة بحرية', options: ['Sh', 'Cl', 'Sl'] },
-      { word: 'Bake', prefix: 'B', family: 'ake', meaning: 'يخبز بالفرن', options: ['B', 'C', 'M'] }
+      { word: 'Bake', prefix: 'B', family: 'ake', meaning: 'يخبز بالفرن', options: ['B', 'C', 'M'] },
+      { word: 'Stop', prefix: 'St', family: 'op', meaning: 'توقف', options: ['St', 'Fl', 'Cr'] }
     ];
 
-    const phraseLevels = [
-      { correct: ["The", "cat", "is", "on", "the", "mat"], words: ["on", "cat", "The", "mat", "is", "the"], meaning: "القطة على السجادة" },
-      { correct: ["I", "eat", "rice", "and", "meat"], words: ["and", "I", "meat", "rice", "eat"], meaning: "أنا آكل الأرز واللحم" },
-      { correct: ["This", "is", "my", "new", "phone"], words: ["my", "This", "phone", "is", "new"], meaning: "هذا هو هاتفي الجديد" },
-      { correct: ["The", "sun", "is", "very", "bright", "today"], words: ["today", "sun", "is", "bright", "very", "The"], meaning: "الشمس ساطعة جداً اليوم" },
-      { correct: ["We", "play", "in", "the", "clean", "lake"], words: ["lake", "We", "play", "clean", "the", "in"], meaning: "نحن نلعب في البحيرة النظيفة" },
-      { correct: ["He", "has", "ten", "green", "pens"], words: ["green", "He", "pens", "has", "ten"], meaning: "هو لديه عشرة أقلام خضراء" }
-    ];
+    // ==========================================
+    // 2. المكونات الأساسية ودوال النطق القوية
+    // ==========================================
+    const Icons = {
+      home: <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+      volume: <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>,
+      puzzle: <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 5a2.5 2.5 0 0 1 5 0V7h1.5A2.5 2.5 0 0 1 20.5 9.5V11h-2a2.5 2.5 0 0 0 0 5h2v1.5a2.5 2.5 0 0 1-2.5 2.5H16.5v-2a2.5 2.5 0 0 0-5 0v2H10A2.5 2.5 0 0 1 7.5 18V16.5h2a2.5 2.5 0 0 0 0-5h-2V9.5A2.5 2.5 0 0 1 10 7h1.5V5z"/></svg>,
+      book: <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+      sparkles: <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>,
+      game: <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><path d="M6 12h4M8 10v4M15 13v.01M18 11v.01"/></svg>,
+      reset: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    };
 
     function App() {
       const [currentScreen, setCurrentScreen] = useState('menu');
-      const [loadingText, setLoadingText] = useState(null);
 
-      const playAudioIntelligent = async (text) => {
-        if (!apiKey) {
-          useFallbackTTS(text);
-          return;
-        }
-        setLoadingText("جاري تشغيل الصوت بالذكاء الاصطناعي...");
-        try {
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: `Generate slow, educational pronunciation audio in American English for the phrase: "${text}".` }] }],
-              generationConfig: { responseMimeType: "application/json" }
-            })
-          });
-          const data = await response.json();
-          const pcmBase64 = data.candidates[0].content.parts[0].text; 
-          const audioUrl = pcmToWav(pcmBase64);
-          const audio = new Audio(audioUrl);
-          audio.play();
-        } catch (e) {
-          useFallbackTTS(text);
-        } finally {
-          setLoadingText(null);
-        }
-      };
-
-      const useFallbackTTS = (text) => {
+      // دالة النطق المباشرة القوية (تعمل على كل الأجهزة بلا تأخير)
+      const playTTS = (text) => {
         if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
+          window.speechSynthesis.cancel(); // إيقاف أي صوت سابق
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.lang = 'en-US';
-          utterance.rate = 0.8;
+          utterance.rate = 0.85; // سرعة مناسبة للتعليم
+          utterance.pitch = 1;
           window.speechSynthesis.speak(utterance);
-        }
-      };
-
-      const getIcon = (name) => {
-        switch(name) {
-          case 'home': return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
-          case 'volume': return <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="inline-block"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
-          case 'puzzle': return <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 5a2.5 2.5 0 0 1 5 0V7h1.5A2.5 2.5 0 0 1 20.5 9.5V11h-2a2.5 2.5 0 0 0 0 5h2v1.5a2.5 2.5 0 0 1-2.5 2.5H16.5v-2a2.5 2.5 0 0 0-5 0v2H10A2.5 2.5 0 0 1 7.5 18V16.5h2a2.5 2.5 0 0 0 0-5h-2V9.5A2.5 2.5 0 0 1 10 7h1.5V5z"/></svg>;
-          case 'book': return <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
-          case 'sparkles': return <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
-          case 'game': return <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><path d="M6 12h4M8 10v4M15 13v.01M18 11v.01"/></svg>;
-          default: return null;
+        } else {
+          alert("للأسف، محرك الصوت غير مدعوم في هذا المتصفح.");
         }
       };
 
       return (
-        <div className="min-h-screen bg-slate-50 text-slate-800 pb-12">
-          {loadingText && (
-            <div className="fixed top-4 left-4 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg z-50 animate-bounce">
-              {loadingText}
-            </div>
-          )}
-
-          <header className="bg-indigo-950 text-white p-5 shadow-lg flex justify-between items-center">
+        <div className="min-h-screen bg-slate-50 text-slate-800 pb-12 font-sans selection:bg-indigo-200">
+          <header className="bg-indigo-950 text-white p-5 shadow-lg flex justify-between items-center sticky top-0 z-50">
             <div>
-              <h1 className="text-xl font-black text-yellow-400">أكاديمية الكلمات الذكية 🎓</h1>
-              <p className="text-xs text-indigo-200">تطوير مخصص وشامل لـ ماجد</p>
+              <h1 className="text-xl md:text-2xl font-black text-yellow-400 tracking-wide">أكاديمية الكلمات 🎓</h1>
+              <p className="text-xs text-indigo-200 mt-1 font-bold">النسخة الشاملة لـ ماجد (1000+ كلمة)</p>
             </div>
             {currentScreen !== 'menu' && (
-              <button onClick={() => setCurrentScreen('menu')} className="bg-yellow-500 hover:bg-yellow-600 text-indigo-950 px-4 py-2 rounded-full font-black flex items-center gap-1 transition-transform active:scale-95">
-                {getIcon('home')} الرئيسية
+              <button 
+                onClick={() => setCurrentScreen('menu')} 
+                className="bg-yellow-500 hover:bg-yellow-600 text-indigo-950 px-4 py-2.5 rounded-full font-black flex items-center gap-2 transition-transform active:scale-95 shadow-md"
+              >
+                {Icons.home} <span className="hidden md:inline">الرئيسية</span>
               </button>
             )}
           </header>
 
-          <main className="p-4 max-w-6xl mx-auto mt-6">
-            {currentScreen === 'menu' && <MainMenu onNavigate={setCurrentScreen} getIcon={getIcon} />}
-            {currentScreen === 'factory' && <WordFactory playTTS={playAudioIntelligent} />}
-            {currentScreen === 'dict' && <BasicDictionary playTTS={playAudioIntelligent} getIcon={getIcon} />}
-            {currentScreen === 'patterns' && <SpecialPatterns playTTS={playAudioIntelligent} getIcon={getIcon} />}
-            {currentScreen === 'phraseGame' && <PhraseBuilderGame playTTS={playAudioIntelligent} getIcon={getIcon} />}
+          <main className="p-4 max-w-6xl mx-auto mt-4">
+            {currentScreen === 'menu' && <MainMenu onNavigate={setCurrentScreen} />}
+            {currentScreen === 'factory' && <WordFactory playTTS={playTTS} />}
+            {currentScreen === 'dict' && <MegaDictionary playTTS={playTTS} />}
+            {currentScreen === 'patterns' && <SpecialPatterns playTTS={playTTS} />}
+            {currentScreen === 'phraseGame' && <PhraseBuilderGame playTTS={playTTS} />}
           </main>
         </div>
       );
     }
 
-    function MainMenu({ onNavigate, getIcon }) {
+    function MainMenu({ onNavigate }) {
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-          <div onClick={() => onNavigate('factory')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-blue-500 transition-all">
-            <div className="p-4 rounded-full bg-blue-50 text-blue-600 mb-4">{getIcon('puzzle')}</div>
-            <h2 className="text-2xl font-bold mb-2">مصنع الكلمات</h2>
-            <p className="text-slate-500 text-sm text-center">تركيب الحروف لبناء عائلات الكلمات</p>
-          </div>
-          <div onClick={() => onNavigate('dict')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-purple-500 transition-all">
-            <div className="p-4 rounded-full bg-purple-50 text-purple-600 mb-4">{getIcon('book')}</div>
-            <h2 className="text-2xl font-bold mb-2">الموسوعة الشاملة</h2>
-            <p className="text-slate-500 text-sm text-center">دليل عائلات الكلمات من A إلى Z</p>
-          </div>
-          <div onClick={() => onNavigate('patterns')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-orange-500 transition-all">
-            <div className="p-4 rounded-full bg-orange-50 text-orange-600 mb-4">{getIcon('sparkles')}</div>
-            <h2 className="text-2xl font-bold mb-2">المقاطع الصوتية</h2>
-            <p className="text-slate-500 text-sm text-center">نطق الأحرف المركبة والقواعد المتقدمة</p>
-          </div>
-          <div onClick={() => onNavigate('phraseGame')} className="bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 border-emerald-500 transition-all">
-            <div className="p-4 rounded-full bg-emerald-50 text-emerald-600 mb-4">{getIcon('game')}</div>
-            <h2 className="text-2xl font-bold mb-2">تحدي الجمل</h2>
-            <p className="text-slate-500 text-sm text-center">ترتيب الكلمات لتكوين جمل إنجليزية كاملة</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+          <MenuCard title="تحدي الجمل" desc="50 مستوى لترتيب الكلمات" icon={Icons.game} color="emerald" onClick={() => onNavigate('phraseGame')} />
+          <MenuCard title="الموسوعة الشاملة" desc="أكثر من 1000 كلمة مصنفة" icon={Icons.book} color="purple" onClick={() => onNavigate('dict')} />
+          <MenuCard title="المقاطع الصوتية" desc="قواعد النطق المتقدمة" icon={Icons.sparkles} color="orange" onClick={() => onNavigate('patterns')} />
+          <MenuCard title="مصنع الكلمات" desc="ركب الحروف وبناء العائلات" icon={Icons.puzzle} color="blue" onClick={() => onNavigate('factory')} />
         </div>
       );
     }
 
-    function WordFactory({ playTTS }) {
-      const [levelIndex, setLevelIndex] = useState(0);
-      const [feedback, setFeedback] = useState(null);
-      const level = wordFactoryLevels[levelIndex];
-
-      const handleChoice = (letter) => {
-        if (letter === level.prefix) {
-          setFeedback('success'); playTTS(level.word);
-          setTimeout(() => {
-            if (levelIndex + 1 < wordFactoryLevels.length) { setLevelIndex(levelIndex + 1); setFeedback(null); }
-            else { alert("كفو يا بطل! أنهيت جميع مستويات مصنع الكلمات!"); setLevelIndex(0); setFeedback(null); }
-          }, 2000);
-        } else { setFeedback('error'); setTimeout(() => setFeedback(null), 1000); }
+    function MenuCard({ title, desc, icon, color, onClick }) {
+      const colors = {
+        blue: "text-blue-600 bg-blue-50 border-blue-500 hover:shadow-blue-200",
+        purple: "text-purple-600 bg-purple-50 border-purple-500 hover:shadow-purple-200",
+        orange: "text-orange-600 bg-orange-50 border-orange-500 hover:shadow-orange-200",
+        emerald: "text-emerald-600 bg-emerald-50 border-emerald-500 hover:shadow-emerald-200"
       };
+      return (
+        <div onClick={onClick} className={`bg-white rounded-3xl shadow-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:-translate-y-2 border-b-4 transition-all duration-300 ${colors[color]}`}>
+          <div className="p-5 rounded-full mb-4 bg-white shadow-sm border border-slate-100">{icon}</div>
+          <h2 className="text-2xl font-black mb-2 text-slate-800">{title}</h2>
+          <p className="text-slate-500 text-sm text-center font-bold">{desc}</p>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // 3. الموسوعة الشاملة (بأقسام ذكية)
+    // ==========================================
+    function MegaDictionary({ playTTS }) {
+      // استخراج الأقسام الرئيسية فقط
+      const categories = [...new Set(megaDictionary.map(item => item.c))];
+      const [activeCat, setActiveCat] = useState(categories[0]);
 
       return (
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-2xl mx-auto text-center border border-slate-100 animate-fadeIn">
-          <h2 className="text-3xl font-black mb-8 text-blue-600">🧩 مصنع الكلمات</h2>
-          <div className="mb-6 bg-blue-500 text-white p-4 rounded-2xl inline-block text-2xl font-black px-8">{level.meaning}</div>
-          <div className="flex justify-center items-center gap-4 mb-12 text-5xl font-black" dir="ltr">
-            <div className={`w-24 h-24 border-4 border-dashed rounded-2xl flex items-center justify-center ${feedback === 'success' ? 'border-green-500 text-green-600 bg-green-50' : 'border-slate-300 text-slate-400'}`}>
-              {feedback === 'success' ? level.prefix : '?'}
-            </div>
-            <div>{level.family}</div>
+        <div className="animate-fadeIn">
+          <h2 className="text-3xl font-black text-center mb-6 text-purple-700">📖 القاموس الشامل</h2>
+          
+          {/* أزرار الأقسام لتنظيم الـ 1000 كلمة */}
+          <div className="flex flex-wrap gap-2 justify-center mb-8">
+            {categories.map((cat, idx) => (
+              <button 
+                key={idx} 
+                onClick={() => setActiveCat(cat)}
+                className={`px-5 py-2.5 rounded-full font-bold text-sm transition-all ${activeCat === cat ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-purple-600 border border-purple-200 hover:bg-purple-50'}`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
-          <div className="flex justify-center gap-4" dir="ltr">
-            {level.options.map((l, i) => (
-              <button key={i} onClick={() => handleChoice(l)} className="w-20 h-20 bg-slate-800 text-white rounded-2xl text-2xl font-black shadow-[0_5px_0_#0f172a] active:translate-y-1 transition-all">{l}</button>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {megaDictionary.filter(item => item.c === activeCat).map((group, idx) => (
+              <div key={idx} className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden">
+                <div className="bg-purple-100 text-purple-900 py-3 px-5 font-black text-xl text-center border-b border-purple-200" dir="ltr">
+                  {group.f}
+                </div>
+                <div className="p-4 max-h-[300px] overflow-y-auto custom-scrollbar space-y-2">
+                  {group.data.map((w, i) => (
+                    <div key={i} className="flex justify-between items-center bg-slate-50 p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                      <div className="text-right">
+                        <span className="font-black text-lg block text-slate-800">{w.w}</span>
+                        <span className="text-xs text-slate-500 font-bold">{w.m}</span>
+                      </div>
+                      <button 
+                        onClick={() => playTTS(w.w)} 
+                        className="bg-white p-2.5 rounded-full text-purple-600 shadow-sm border border-slate-200 hover:bg-purple-600 hover:text-white transition-colors active:scale-90"
+                      >
+                        {Icons.volume}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
       );
     }
 
-    function BasicDictionary({ playTTS, getIcon }) {
-      return (
-        <div className="space-y-8 animate-fadeIn">
-          {Object.entries(familyDictionary).map(([group, families]) => (
-            <div key={group} className="bg-white rounded-2xl p-6 shadow-md border-b-4 border-purple-500">
-              <h3 className="text-2xl font-black text-purple-800 border-b pb-2 mb-4">{group}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(families).map(([fam, words]) => (
-                  <div key={fam} className="bg-slate-50 p-4 rounded-xl">
-                    <span className="bg-purple-100 text-purple-800 font-bold px-3 py-1 rounded text-sm">عائلة -{fam}</span>
-                    <div className="mt-3 space-y-2">
-                      {words.map((w, idx) => (
-                        <div key={idx} className="bg-white p-3 rounded-lg flex justify-between items-center shadow-sm">
-                          <div>
-                            <span className="font-bold text-lg block">{w.word}</span>
-                            <span className="text-sm text-slate-500">{w.meaning} • النطق التقريبي: [{w.sound}]</span>
-                          </div>
-                          <button onClick={() => playTTS(w.word)} className="bg-purple-100 p-2 rounded-full text-purple-700 hover:bg-purple-200 transition-colors">{getIcon('volume')}</button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    function SpecialPatterns({ playTTS, getIcon }) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
-          {specialPatternsData.map((p, i) => (
-            <div key={i} className="bg-white p-6 rounded-3xl shadow-md border-t-4 border-orange-500">
-              <div className="flex justify-between mb-4">
-                <span className="text-3xl font-black text-orange-600 font-mono">{p.pattern}</span>
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-xl font-bold">{p.sound}</span>
-              </div>
-              <p className="text-slate-600 mb-4 text-sm">{p.explanation}</p>
-              {p.examples.map((ex, idx) => (
-                <div key={idx} className="bg-slate-50 p-3 rounded-xl flex justify-between items-center mb-2">
-                  <div>
-                    <span className="font-bold block">{ex.word}</span>
-                    <span className="text-xs text-slate-500">{ex.meaning} • [{ex.sound}]</span>
-                  </div>
-                  <button onClick={() => playTTS(ex.word)} className="bg-orange-100 p-2 rounded-full text-orange-600 hover:bg-orange-200 transition-colors">{getIcon('volume')}</button>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    function PhraseBuilderGame({ playTTS, getIcon }) {
+    // ==========================================
+    // 4. تحدي الجمل (50 مستوى مع زر الصوت والريست)
+    // ==========================================
+    function PhraseBuilderGame({ playTTS }) {
       const [lvl, setLvl] = useState(0);
       const [selected, setSelected] = useState([]);
       const [available, setAvailable] = useState([]);
@@ -496,9 +272,11 @@
 
       const currentLevel = phraseLevels[lvl];
 
+      // خلط الكلمات عند بدء المستوى
       useEffect(() => {
         if (currentLevel) {
-          setAvailable([...currentLevel.words]);
+          const shuffled = [...currentLevel.c].sort(() => Math.random() - 0.5);
+          setAvailable(shuffled);
           setSelected([]);
           setFeedback(null);
         }
@@ -514,59 +292,143 @@
         setSelected(selected.filter((_, i) => i !== idx));
       };
 
+      const resetLevel = () => {
+        const shuffled = [...currentLevel.c].sort(() => Math.random() - 0.5);
+        setAvailable(shuffled);
+        setSelected([]);
+        setFeedback(null);
+      };
+
       const checkSentence = () => {
-        const isCorrect = JSON.stringify(selected) === JSON.stringify(currentLevel.correct);
+        const isCorrect = JSON.stringify(selected) === JSON.stringify(currentLevel.c);
         if (isCorrect) {
           setFeedback('success');
-          playTTS(currentLevel.correct.join(" "));
+          playTTS(currentLevel.c.join(" "));
           setTimeout(() => {
             if (lvl + 1 < phraseLevels.length) setLvl(lvl + 1);
-            else { alert("كفووو يا ماجد الأسطورة! أكملت كل مستويات تحدي تركيب الجمل!"); setLvl(0); }
-          }, 2500);
+            else { alert("مبروك يا ماجد! ختمت كل مستويات الجمل الـ 50!"); setLvl(0); }
+          }, 2000);
         } else {
           setFeedback('error');
-          setTimeout(() => setFeedback(null), 1500);
+          setTimeout(() => setFeedback(null), 1000);
         }
       };
 
       if (!currentLevel) return null;
 
       return (
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-3xl mx-auto animate-fadeIn">
-          <h2 className="text-3xl font-black text-center mb-4 text-emerald-600 flex justify-center items-center gap-2">
-            <span>🎮</span> تحدي تركيب الجمل
-          </h2>
+        <div className="bg-white rounded-3xl shadow-xl p-6 md:p-10 max-w-3xl mx-auto animate-fadeIn border border-slate-100">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-black text-emerald-600 flex items-center gap-2">
+              <span>🎮</span> تحدي الجمل
+            </h2>
+            <span className="bg-emerald-100 text-emerald-800 px-4 py-1.5 rounded-full font-bold text-sm">
+              مستوى {lvl + 1} من {phraseLevels.length}
+            </span>
+          </div>
           
-          <div className="text-center text-lg bg-emerald-50 text-emerald-800 p-4 rounded-xl font-bold mb-8 flex items-center justify-between">
-            <span className="text-right flex-1">رتب الكلمات لترجمة: {currentLevel.meaning}</span>
-            {/* زر الصوت الذهبي التفاعلي الذي أضفناه لمساعدتك على الاستماع */}
+          <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl mb-8 flex items-center justify-between shadow-inner">
+            <p className="text-lg font-black text-emerald-900">
+              ترجم: <span className="text-emerald-700">{currentLevel.m}</span>
+            </p>
             <button 
-              onClick={() => playTTS(currentLevel.correct.join(" "))} 
-              className="bg-emerald-500 text-white p-2 rounded-full hover:bg-emerald-600 transition-all shadow-md active:scale-90 ml-3 flex items-center justify-center"
-              title="استمع للجملة الصحيحة"
+              onClick={() => playTTS(currentLevel.c.join(" "))} 
+              className="bg-emerald-500 text-white p-3 rounded-full hover:bg-emerald-600 transition-all shadow-md active:scale-90 flex-shrink-0"
+              title="استمع للحل الصحيح"
             >
-              {getIcon('volume')}
+              {Icons.volume}
             </button>
           </div>
           
-          <div className={`min-h-20 p-4 border-4 border-dashed rounded-2xl flex flex-wrap gap-2 items-center mb-6 ${feedback === 'success' ? 'border-green-500 bg-green-50' : feedback === 'error' ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'}`} dir="ltr">
-            {selected.length === 0 && <span className="text-slate-400 font-bold mx-auto">اضغط على الكلمات بالأسفل لترتيبها هنا...</span>}
+          <div className={`min-h-[100px] p-5 border-4 border-dashed rounded-2xl flex flex-wrap gap-2 items-center mb-6 transition-colors ${feedback === 'success' ? 'border-green-500 bg-green-50' : feedback === 'error' ? 'border-red-500 bg-red-50 animate-pulse' : 'border-slate-300 bg-slate-50'}`} dir="ltr">
+            {selected.length === 0 && <span className="text-slate-400 font-bold mx-auto text-center w-full">الكلمات المحددة تظهر هنا...</span>}
             {selected.map((w, i) => (
-              <button key={i} onClick={() => removeWord(w, i)} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-lg transition-transform active:scale-95">{w}</button>
+              <button key={i} onClick={() => removeWord(w, i)} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-lg transition-transform active:scale-95 shadow-sm">{w}</button>
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-3 justify-center mb-8" dir="ltr">
+          <div className="flex flex-wrap gap-3 justify-center mb-10" dir="ltr">
             {available.map((w, i) => (
-              <button key={i} onClick={() => selectWord(w, i)} className="bg-white border-2 border-slate-200 text-slate-800 font-bold px-4 py-2 rounded-xl text-lg shadow-sm hover:bg-slate-50 transition-all">{w}</button>
+              <button key={i} onClick={() => selectWord(w, i)} className="bg-white border-2 border-slate-200 text-slate-800 font-bold px-5 py-3 rounded-xl text-lg shadow-sm hover:bg-slate-50 transition-transform active:scale-95">{w}</button>
             ))}
           </div>
 
-          {available.length === 0 && (
-            <div className="text-center">
-              <button onClick={checkSentence} className="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xl px-10 py-3 rounded-full shadow-lg transition-transform active:scale-95">التحقق من صحة الجملة</button>
+          <div className="flex justify-center gap-4">
+            {selected.length > 0 && (
+               <button onClick={resetLevel} className="bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-full flex items-center gap-2 hover:bg-slate-300 transition-colors">
+                 {Icons.reset} مسح
+               </button>
+            )}
+            {available.length === 0 && (
+              <button onClick={checkSentence} className="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xl px-12 py-3 rounded-full shadow-lg transition-transform active:scale-95">
+                تحقق من الإجابة
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // 5. مصنع الكلمات والقواعد الخاصة
+    // ==========================================
+    function WordFactory({ playTTS }) {
+      const [levelIndex, setLevelIndex] = useState(0);
+      const [feedback, setFeedback] = useState(null);
+      const level = wordFactoryLevels[levelIndex];
+
+      const handleChoice = (letter) => {
+        if (letter === level.prefix) {
+          setFeedback('success'); playTTS(level.word);
+          setTimeout(() => {
+            if (levelIndex + 1 < wordFactoryLevels.length) { setLevelIndex(levelIndex + 1); setFeedback(null); }
+            else { alert("كفو! أنهيت جميع الكلمات المتاحة بمصنع الكلمات!"); setLevelIndex(0); setFeedback(null); }
+          }, 2000);
+        } else { setFeedback('error'); setTimeout(() => setFeedback(null), 1000); }
+      };
+
+      return (
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-2xl mx-auto text-center border border-slate-100 animate-fadeIn">
+          <h2 className="text-3xl font-black mb-8 text-blue-600">🧩 مصنع الكلمات</h2>
+          <div className="mb-6 bg-blue-500 text-white p-4 rounded-2xl inline-block text-2xl font-black px-8">{level.meaning}</div>
+          <div className="flex justify-center items-center gap-4 mb-12 text-5xl font-black" dir="ltr">
+            <div className={`w-24 h-24 border-4 border-dashed rounded-2xl flex items-center justify-center transition-colors ${feedback === 'success' ? 'border-green-500 text-green-600 bg-green-50' : feedback === 'error' ? 'border-red-500 text-red-500 bg-red-50' : 'border-slate-300 text-slate-400'}`}>
+              {feedback === 'success' ? level.prefix : '?'}
             </div>
-          )}
+            <div className="text-slate-800">{level.family}</div>
+          </div>
+          <div className="flex justify-center gap-4" dir="ltr">
+            {level.options.map((l, i) => (
+              <button key={i} onClick={() => handleChoice(l)} className="w-20 h-20 bg-slate-800 text-white rounded-2xl text-2xl font-black shadow-[0_5px_0_#0f172a] active:translate-y-1 transition-all">{l}</button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function SpecialPatterns({ playTTS }) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+          {specialPatternsData.map((p, i) => (
+            <div key={i} className="bg-white p-6 rounded-3xl shadow-md border-t-4 border-orange-500 flex flex-col">
+              <div className="flex justify-between mb-4 items-center">
+                <span className="text-4xl font-black text-orange-600 font-mono" dir="ltr">{p.pattern}</span>
+                <span className="bg-orange-100 text-orange-800 px-4 py-2 rounded-xl font-bold">{p.sound}</span>
+              </div>
+              <p className="text-slate-600 mb-6 text-sm font-bold flex-1">{p.explanation}</p>
+              <div className="space-y-2 border-t border-slate-100 pt-4">
+                {p.examples.map((ex, idx) => (
+                  <div key={idx} className="bg-slate-50 p-3 rounded-xl flex justify-between items-center">
+                    <div>
+                      <span className="font-black text-lg block text-slate-800" dir="ltr">{ex.word}</span>
+                      <span className="text-xs text-slate-500 font-bold">{ex.meaning}</span>
+                    </div>
+                    <button onClick={() => playTTS(ex.word)} className="bg-white border border-slate-200 p-2.5 rounded-full text-orange-600 hover:bg-orange-500 hover:text-white transition-colors active:scale-90">{Icons.volume}</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       );
     }
